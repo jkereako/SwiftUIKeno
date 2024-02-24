@@ -1,0 +1,208 @@
+openapi: '3.0.3'
+info:
+  title: SwiftUIKeno
+  version: 1.0.0
+servers:
+  - url: https://www.masslottery.com/api
+    description: Production server
+  - url: http://127.0.0.1:8080/api
+    description: Development server
+paths:
+  /v1/keno/hot-cold-numbers:
+    get:
+        operationId: hotNumbers
+        responses:
+          '200':
+            description: Fetch hot and cold numbers.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - hotNumbers
+                    - winningNumber
+                    - drawFrequency
+                    - coldNumbers
+                  properties:
+                    hotNumbers:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/hotColdNumber'
+                    coldNumbers:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/hotColdNumber'
+                  
+
+  /v1/keno/draws-by-date-range:
+    get:
+      operationId: drawForDates
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+          description: The start date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+          description: The end date
+      responses:
+        '400':
+          description: Invalid `startDate` or `endDate`
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Bad query: startDate was not provided"
+        '200':
+          description: Fetch a particular Keno game.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - draws
+                  - drawNumber
+                  - bonus
+                  - drawDate
+                  - winningNumbers
+                properties:
+                  draws:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        drawNumber:
+                          type: integer
+                          format: int32
+                        bonus:
+                          type: integer
+                          format: int32
+                        drawDate:
+                          type: string
+                          format: date
+                        winningNumbers:
+                          type: array
+                          items:
+                            type: integer
+                            format: int32
+
+  /v1/keno/draw:
+    get:
+      operationId: drawForIdentifier
+      parameters:
+        - in: query
+          name: drawNumber
+          schema:
+            type: integer
+          description: The game number
+      responses:
+        '400':
+          description: Invalid `drawNumber`
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Bad query: drawNumber was not provided"
+        '200':
+          description: Fetch a particular Keno game.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                    - drawNumber
+                    - bonus
+                    - drawDate
+                    - activePromotions
+                    - winningNumbers
+                    - resultsSequence
+                properties:
+                  drawNumber:
+                    type: integer
+                    format: int32
+                  bonus:
+                    type: integer
+                    format: int32
+                  drawDate:
+                    type: string
+                    format: date
+                  activePromotions:
+                    type: array
+                    items:
+                      type: object
+                  winningNumbers:
+                    type: array
+                    items:
+                      type: integer
+                      format: int32
+                  resultsSequence:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        winningNumber:
+                          type: integer
+                          format: int32
+  /v1/keno/latest-draw:
+    get:
+      operationId: latestDraw
+      responses:
+        '200':
+          description: Fetch the latest draw.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                    - drawNumber
+                    - bonus
+                    - drawDate
+                    - activePromotions
+                    - winningNumbers
+                    - resultsSequence
+                properties:
+                  drawNumber:
+                    type: integer
+                    format: int32
+                  bonus:
+                    type: integer
+                    format: int32
+                  drawDate:
+                    type: string
+                    format: date
+                  activePromotions:
+                    type: array
+                    items:
+                      type: object
+                  winningNumbers:
+                    type: array
+                    items:
+                      type: integer
+                      format: int32
+                  resultsSequence:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        winningNumber:
+                          type: integer
+                          format: int32
+
+components:
+  schemas:
+    hotColdNumber:
+      type: object
+      required:
+      - winningNumber
+      - drawFrequency
+      properties:
+        winningNumber:
+          type: integer
+          format: int32
+        drawFrequency:
+          type: number
+
+
